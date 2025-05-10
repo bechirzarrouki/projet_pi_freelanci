@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Home - Purple Social</title>
-    <link rel="stylesheet" href="home.css">
+    <link rel="stylesheet" href="Home/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet" />
 </head>
@@ -21,7 +21,7 @@
 
     <header class="section__container header__container">
         <h1 class="section__header">Là où les idées se rencontrent Investissements & Compétences</h1>
-        <img src="image/ttt.jpg" alt="header" />
+        <img src="Home/image/ttt.jpg" alt="header" />
     </header>
 
     <section class="section__container plan__container">
@@ -49,9 +49,9 @@
                 </p>
             </div>
             <div class="plan__image">
-                <img src="image/left-infos.jpg" alt="plan" />
-                <img src="image/happyclient-01.jpg" alt="plan" />
-                <img src="image/banner-right.png" alt="plan" />
+                <img src="Home/image/left-infos.jpg" alt="plan" />
+                <img src="Home/image/happyclient-01.jpg" alt="plan" />
+                <img src="Home/image/banner-right.png" alt="plan" />
             </div>
         </div>
     </section>
@@ -92,8 +92,8 @@
 
     <section class="section__container lounge__container">
         <div class="lounge__image">
-            <img src="image/img.png" alt="lounge" />
-            <img src="image/happyclient-01.jpg" alt="lounge" />
+            <img src="Home/image/img.png" alt="lounge" />
+            <img src="Home/image/happyclient-01.jpg" alt="lounge" />
         </div>
         <div class="lounge__content">
             <h2 class="section__header">Donnez un Coup d’Accélérateur à Votre Croissance et Vos Opportunités</h2>
@@ -130,27 +130,27 @@
         <h2 class="section__header">Rencontrez notre équipe</h2>
         <div class="travellers__grid">
             <div class="travellers__card__content">
-                <img src="image/ilef.jpg" alt="client" />
+                <img src="Home/image/ilef.jpg" alt="client" />
                 <h4>Ilef Benjabeur</h4>
                 <p>CEO</p>
             </div>
             <div class="travellers__card__content">
-                <img src="image/samar.jpg" alt="client" />
+                <img src="Home/image/samar.jpg" alt="client" />
                 <h4>Samar Jalleli</h4>
                 <p>Program Cordinator</p>
             </div>
             <div class="travellers__card__content">
-                <img src="image/amin.jpg" alt="client" />
+                <img src="Home/image/amin.jpg" alt="client" />
                 <h4>Amin Naser</h4>
                 <p>Public Relations</p>
             </div>
             <div class="travellers__card__content">
-                <img src="image/rayen.jpg" alt="client" />
+                <img src="Home/image/rayen.jpg" alt="client" />
                 <h4>Rayen Ben Aich</h4>
                 <p>Fundraising Officer</p>
             </div>
             <div class="travellers__card__content">
-                <img src="image/client-4.jpg" alt="client" />
+                <img src="Home/image/client-4.jpg" alt="client" />
                 <h4>Aziz Gharbi</h4>
                 <p>Marketing Responsible</p>
             </div>
