@@ -1,3 +1,6 @@
+<?php
+require_once '../login/db.php';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -12,23 +15,30 @@
 <div class="container mt-4">
     <h2>Créer un nouveau post</h2>
 
-    <form id="postForm">
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success">Post créé avec succès !</div>
+    <?php elseif (isset($_GET['error'])): ?>
+        <div class="alert alert-danger">Erreur lors de la création du post.</div>
+    <?php endif; ?>
+
+    <form id="postForm" enctype="multipart/form-data" method="POST" action="post_crud.php">
+        <input type="hidden" id="author_id" name="author_id" value="<?php echo isset($_SESSION['user_id']) ? $_SESSION['user_id'] : ''; ?>">
         <div class="mb-3">
             <label for="titre" class="form-label">Titre</label>
-            <input type="text" id="titre" class="form-control" required>
+            <input type="text" id="titre" name="titre" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label for="contenu" class="form-label">Contenu</label>
-            <textarea id="contenu" class="form-control" rows="5" required></textarea>
+            <textarea id="contenu" name="contenu" class="form-control" rows="5" required></textarea>
         </div>
 
         <div class="mb-3">
             <label for="image" class="form-label">Image</label>
-            <input type="file" id="image" class="form-control">
+            <input type="file" id="image" name="image" class="form-control">
         </div>
 
-        <button type="button" class="btn btn-primary">Publier</button>
+        <button type="submit" class="btn btn-primary">Publier</button>
     </form>
 
     <div class="mt-4">
@@ -39,33 +49,7 @@
     <div class="mt-5">
         <h4>Liste des Posts</h4>
         <div class="row" id="postsContainer">
-            <!-- Exemple de post statique -->
-            <div class="col-md-4 mb-4 post-card" data-title="exemple de post">
-                <div class="card h-100">
-                    <img src="https://via.placeholder.com/300x150" class="card-img-top" alt="Image du post">
-                    <div class="card-body">
-                        <h5 class="card-title">Exemple de Post</h5>
-                        <p class="card-text">Ceci est un contenu fictif pour démonstration.</p>
-                    </div>
-                    <div class="card-footer-modern d-flex justify-content-between align-items-center">
-                        <div class="date-badge">
-                            <span class="date-icon"><i class="far fa-calendar-alt"></i></span>
-                            <span class="date-text">09/05/2025</span>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="btn-action btn-edit" title="Modifier cet article">
-                                <i class="fas fa-pen"></i>
-                                <span>Modifier</span>
-                            </button>
-                            <button type="button" class="btn-action btn-delete" title="Supprimer cet article">
-                                <i class="fas fa-trash"></i>
-                                <span>Supprimer</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Ajouter d'autres posts ici si besoin -->
+            <!-- Les posts seront chargés dynamiquement par JS -->
         </div>
     </div>
 

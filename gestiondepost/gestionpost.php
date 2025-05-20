@@ -25,20 +25,8 @@
     <div class="error-message" style="display: none;">Message d'erreur de session</div>
 
     <!-- Liste des posts -->
-    <div class="posts-list">
-        <div class="post-card">
-            <img src="storage/image1.jpg" alt="Image du post" class="post-image">
-            <div class="post-details">
-                <h2 class="post-title">Titre Exemple</h2>
-                <p class="post-content">Contenu du post</p>
-                <p class="post-created-at">Créé à 14:32:10</p>
-
-                <form class="delete-post-form">
-                    <button type="submit" class="delete-button">Supprimer</button>
-                </form>
-            </div>
-        </div>
-        <!-- Répétez .post-card pour tester -->
+    <div class="posts-list" id="postsContainer">
+        <!-- Les posts seront chargés dynamiquement par JS -->
     </div>
 
     <div id="pagination"></div>
@@ -80,5 +68,50 @@
 </div>
 
 <script src="gestionpost.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const postsContainer = document.getElementById('postsContainer');
+    // Load posts via AJAX
+    fetch('post_crud.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=read'
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            postsContainer.innerHTML = '';
+            data.posts.forEach(function(post) {
+                const card = document.createElement('div');
+                card.className = 'post-card';
+                card.innerHTML = `
+                    <img src="../${post.image}" alt="Image du post" class="post-image" style="max-width:200px;max-height:120px;object-fit:cover;">
+                    <div class="post-details">
+                        <h2 class="post-title">${post.titre}</h2>
+                        <p class="post-content">${post.contenu}</p>
+                        <p class="post-created-at">Créé à ${post.created_at}</p>
+                        <button class="delete-button">Supprimer</button>
+                    </div>
+                `;
+                card.querySelector('.delete-button').onclick = function() {
+                    if (confirm('Supprimer ce post ?')) {
+                        fetch('post_crud.php', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: 'action=delete&id=' + encodeURIComponent(post.id)
+                        })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.success) location.reload();
+                            else alert('Erreur suppression');
+                        });
+                    }
+                };
+                postsContainer.appendChild(card);
+            });
+        }
+    });
+});
+</script>
 </body>
 </html>
