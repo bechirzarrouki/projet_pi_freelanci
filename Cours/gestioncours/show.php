@@ -1,3 +1,25 @@
+<?php
+require_once '../../login/db.php';
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+$course = null;
+if ($id) {
+    $stmt = $conn->prepare('SELECT * FROM courses WHERE id=?');
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $course = $result->fetch_assoc();
+    $stmt->close();
+}
+if (!$course) {
+    echo '<p style="color:red;text-align:center;">Cours introuvable.</p>';
+    exit;
+}
+$files = $course['files'] ? json_decode($course['files'], true) : [];
+function is_image($file) {
+    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    return in_array($ext, ['jpg','jpeg','png','gif','bmp','webp']);
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,20 +30,31 @@
 </head>
 <body>
     <div class="course-details-container">
-        <h1 class="course-title" id="course-title"></h1>
-        <p class="course-description" id="course-description"></p>
-        <p class="course-content" id="course-content"></p>
-        <p class="course-status" id="course-status"></p>
-        <p class="course-date" id="course-date"></p>
-
-        <div class="course-files" id="course-files">
+        <h1 class="course-title"><?= htmlspecialchars($course['titre']) ?></h1>
+        <p class="course-description">Description : <?= nl2br(htmlspecialchars($course['description'])) ?></p>
+        <p class="course-content">Contenu :<br><?= nl2br(htmlspecialchars($course['contenu'])) ?></p>
+        <p class="course-status">Statut : <?= htmlspecialchars($course['status']) ?></p>
+        <p class="course-date">Date de publication : <?= htmlspecialchars($course['created_at']) ?></p>
+        <div class="course-files">
             <h3>Fichiers :</h3>
-            <ul id="file-list"></ul>
+            <ul id="file-list">
+                <?php if (empty($files)): ?>
+                    <li>Aucun fichier.</li>
+                <?php else: ?>
+                    <?php foreach ($files as $file): ?>
+                        <li>
+                            <?php if (is_image($file)): ?>
+                                <img src="../../<?= htmlspecialchars($file) ?>" alt="Fichier du cours" class="file-image" style="max-width:150px;max-height:100px;vertical-align:middle;">
+                                <a href="../../<?= htmlspecialchars($file) ?>" target="_blank">Voir l'image</a>
+                            <?php else: ?>
+                                <a href="../../<?= htmlspecialchars($file) ?>" download>Télécharger : <?= basename($file) ?></a>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ul>
         </div>
-
-        <a href="#" class="back-button" id="back-button">Retour aux cours</a>
+        <a href="gestioncours.php" class="back-button" id="back-button">Retour aux cours</a>
     </div>
-
-    <script src="showcours.js"></script>
 </body>
 </html>

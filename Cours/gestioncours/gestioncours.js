@@ -56,4 +56,41 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(() => successMessage.style.display = 'none', 500);
         }, 5000);
     }
+
+    // Add course creation handler
+    const addCourseForm = document.querySelector('.add-course-form');
+    if (addCourseForm) {
+        addCourseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const titre = document.getElementById('titre').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const contenu = document.getElementById('contenu').value.trim();
+            const status = document.getElementById('status').value;
+            const filesInput = document.getElementById('files');
+            const formData = new FormData();
+            formData.append('action', 'create');
+            formData.append('titre', titre);
+            formData.append('description', description);
+            formData.append('contenu', contenu);
+            formData.append('status', status);
+            if (filesInput && filesInput.files.length > 0) {
+                for (let i = 0; i < filesInput.files.length; i++) {
+                    formData.append('files[]', filesInput.files[i]);
+                }
+            }
+            fetch('gestioncours_crud.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Erreur création: ' + (data.error || '')); 
+                }
+            })
+            .catch(() => alert('Erreur réseau lors de la création du cours.'));
+        });
+    }
 });

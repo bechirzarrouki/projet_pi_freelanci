@@ -26,7 +26,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 errorList.appendChild(li);
             });
         } else {
-            alert("Login simulation: Email = " + email + ", Password = " + password);
+            // AJAX request to login_process.php
+            fetch('login_process.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '../index.php'; // Redirect on success
+                } else {
+                    errorContainer.classList.remove('d-none');
+                    (data.errors || ['Login failed.']).forEach(err => {
+                        const li = document.createElement('li');
+                        li.textContent = err;
+                        errorList.appendChild(li);
+                    });
+                }
+            })
+            .catch(() => {
+                errorContainer.classList.remove('d-none');
+                const li = document.createElement('li');
+                li.textContent = 'An error occurred. Please try again.';
+                errorList.appendChild(li);
+            });
         }
     });
 });

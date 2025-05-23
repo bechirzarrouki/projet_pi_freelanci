@@ -1,3 +1,12 @@
+<?php
+require_once '../../login/db.php';
+// Get all courses from DB
+$courses = [];
+$result = $conn->query('SELECT * FROM courses ORDER BY created_at DESC');
+while ($row = $result->fetch_assoc()) {
+    $courses[] = $row;
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,35 +25,21 @@
             <div class="search-active-badge">!</div>
             <div class="search-results-counter"></div>
         </div>
-
         <div class="courses-list">
+            <?php foreach ($courses as $course): ?>
             <div class="course-card-container">
-                <div class="course-card">
-                    <h2 class="course-title">Cours HTML</h2>
-                    <p class="course-description">Introduction aux bases de HTML pour débutants.</p>
-                    <p class="course-date">Date de publication : 01/01/2024</p>
+                <div class="course-card-link" style="cursor:pointer;" onclick="window.location.href='../gestioncours/show.php?id=<?= $course['id'] ?>'">
+                    <div class="course-card">
+                        <h2 class="course-title"><?= htmlspecialchars($course['titre']) ?></h2>
+                        <p class="course-description"><?= nl2br(htmlspecialchars($course['description'])) ?></p>
+                        <p class="course-date">Date de publication : <?= htmlspecialchars($course['created_at']) ?></p>
+                    </div>
                 </div>
             </div>
-            <div class="course-card-container">
-                <div class="course-card">
-                    <h2 class="course-title">Cours CSS</h2>
-                    <p class="course-description">Apprenez à styliser vos pages web avec CSS.</p>
-                    <p class="course-date">Date de publication : 10/02/2024</p>
-                </div>
-            </div>
-            <div class="course-card-container">
-                <div class="course-card">
-                    <h2 class="course-title">Cours JavaScript</h2>
-                    <p class="course-description">Dynamisez vos sites web avec JavaScript.</p>
-                    <p class="course-date">Date de publication : 15/03/2024</p>
-                </div>
-            </div>
-           
+            <?php endforeach; ?>
         </div>
-
         <div id="pagination" class="pagination-controls"></div>
     </div>
-
     <script src="cours.js"></script>
 </body>
 </html>

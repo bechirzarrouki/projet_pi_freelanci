@@ -90,57 +90,92 @@ document.addEventListener('DOMContentLoaded', function () {
         displayPosts();
     });
 
-    // Gestion bouton Modifier
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.btn-edit')) {
-            currentPost = e.target.closest('.post-card');
-            const title = currentPost.querySelector('.card-title').textContent;
-            const content = currentPost.querySelector('.card-text').textContent;
-
-            document.getElementById('editTitle').value = title;
-            document.getElementById('editContent').value = content;
-
-            editModal.show();
+    // CRUD: Load posts from DB
+    fetch('post_crud.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'action=read'
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            postsContainer.innerHTML = '';
+            data.posts.forEach(post => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-4 post-card';
+                col.dataset.title = post.titre.toLowerCase();
+                col.innerHTML = `
+                <div class="h-100">
+                    <img src="${post.image ? '../' + post.image : 'https://via.placeholder.com/300x150'}" class="card-img-top" alt="Image du post">
+                    <div class="card-body">
+                        <h5 class="card-title">${post.titre}</h5>
+                        <p class="card-text">${post.contenu}</p>
+                    </div>
+                    <div class="card-footer-modern d-flex justify-content-between align-items-center">
+                        <div class="date-badge">
+                            <span class="date-icon"><i class="far fa-calendar-alt"></i></span>
+                            <span class="date-text">${post.created_at ? post.created_at.split(' ')[0].split('-').reverse().join('/') : ''}</span>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-edit" title="Modifier cet article">\n<i class="fas fa-pen"></i><span>Modifier</span>\n</button>
+                            <button type="button" class="btn-action btn-delete" title="Supprimer cet article">\n<i class="fas fa-trash"></i><span>Supprimer</span>\n</button>
+                        </div>
+                    </div>
+                </div>`;
+                // Attach event listeners for edit and delete
+                col.querySelector('.btn-edit').onclick = function() {
+                    window.editPost(post);
+                };
+                col.querySelector('.btn-delete').onclick = function() {
+                    window.deletePost(post.id);
+                };
+                postsContainer.appendChild(col);
+            });
         }
     });
 
-    // Enregistrement après modification
-    document.getElementById('editPostForm').addEventListener('submit', function (e) {
+    // Create post
+    document.querySelector('#postForm button').onclick = function(e) {
         e.preventDefault();
-        if (currentPost) {
-            const newTitle = document.getElementById('editTitle').value.trim();
-            const newContent = document.getElementById('editContent').value.trim();
+        const titre = document.getElementById('titre').value;
+        const contenu = document.getElementById('contenu').value;
+        const imageInput = document.getElementById('image');
+        const formData = new FormData();
+        formData.append('action', 'create');
+        formData.append('titre', titre);
+        formData.append('contenu', contenu);
+        if (imageInput.files[0]) formData.append('image', imageInput.files[0]);
+        fetch('post_crud.php', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => { if (data.success) location.reload(); else alert('Erreur création'); });
+    };
 
-            currentPost.querySelector('.card-title').textContent = newTitle;
-            currentPost.querySelector('.card-text').textContent = newContent;
-            currentPost.dataset.title = newTitle.toLowerCase();
+    // Edit post (simple prompt for demo)
+    window.editPost = function(post) {
+        const titre = prompt('Titre', post.titre);
+        if (titre === null) return;
+        const contenu = prompt('Contenu', post.contenu);
+        if (contenu === null) return;
+        fetch('post_crud.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=update&id=${post.id}&titre=${encodeURIComponent(titre)}&contenu=${encodeURIComponent(contenu)}&image=${encodeURIComponent(post.image || '')}`
+        })
+        .then(r => r.json())
+        .then(data => { if (data.success) location.reload(); else alert('Erreur modification'); });
+    };
 
-            editModal.hide();
-            displayPosts();
-        }
-    });
-
-    // Gestion bouton Supprimer
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.btn-delete')) {
-            currentPost = e.target.closest('.post-card');
-            deleteModal.show();
-        }
-    });
-
-    // Confirmation suppression
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
-        if (currentPost) {
-            currentPost.remove();
-            const index = postCards.indexOf(currentPost);
-            if (index !== -1) {
-                postCards.splice(index, 1);
-                filteredPosts = postCards;
-            }
-            deleteModal.hide();
-            displayPosts();
-        }
-    });
+    // Delete post
+    window.deletePost = function(id) {
+        if (!confirm('Supprimer ce post ?')) return;
+        fetch('post_crud.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `action=delete&id=${id}`
+        })
+        .then(r => r.json())
+        .then(data => { if (data.success) location.reload(); else alert('Erreur suppression'); });
+    };
 
     displayPosts();
 });
