@@ -9,19 +9,25 @@
     <div class="posts-container">
         <h1 class="page-title">Projet</h1>
 
-        <!-- Formulaire de création désactivé -->
-        <!-- 
         <div class="post-form">
             <h2>Créer un nouveau Projet</h2>
-            <form>
-                ...
+            <form id="createProjectForm">
+                <input type="text" name="name" placeholder="Nom du projet" required><br>
+                <textarea name="description" placeholder="Description du projet" required></textarea><br>
+                <input type="date" name="start_date" required><br>
+                <input type="date" name="end_date"><br>
+                <select name="status" required>
+                    <option value="planned">Planned</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="completed">Completed</option>
+                </select><br>
+                <button type="submit">Créer le Projet</button>
             </form>
         </div>
-        -->
 
         <!-- Liste des projets -->
-        <div class="posts-list" id="projects-container">
-            <div class="post-card">
+        <div id="projects-container">
+            <div class="post-card" onclick="goToPropositions(1)" style="cursor:pointer;">
                 <div class="post-card-link">
                     <div class="post-details">
                         <h2 class="post-title">Projet A</h2>
@@ -39,10 +45,12 @@
                         "start_date": "2024-01-01",
                         "end_date": "2024-06-01",
                         "status": "planned"
-                    })' class="edit-button">Modifier</button>
+                    }); event.stopPropagation();' class="edit-button">Modifier</button>
+
+                    <button onclick="deleteProject(1); event.stopPropagation();" class="delete-button">Supprimer</button>
                 </div>
             </div>
-            <!-- Ajoute d'autres projets statiquement ici si besoin -->
+            <!-- Tu peux ajouter d'autres projets ici statiquement ou via JS -->
         </div>
 
         <!-- Conteneur de pagination -->

@@ -1,48 +1,37 @@
-let propositions = [
-    {
-        id: 1,
-        contenu: "Je propose de développer le site en 2 semaines.",
-        budget: 1200,
-        date_creation: "2025-05-10",
-        date_fin: "2025-05-24"
-    },
-    {
-        id: 2,
-        contenu: "Je peux livrer en 10 jours avec design responsive.",
-        budget: 1500,
-        date_creation: "2025-05-12",
-        date_fin: "2025-05-22"
-    }
-];
-
-let currentPage = 1;
 const propositionsPerPage = 2;
-let filteredPropositions = [...propositions];
+let currentPage = 1;
+let filteredPropositions = [];
 
-// Affichage des propositions
+document.addEventListener("DOMContentLoaded", () => {
+    filteredPropositions = Array.from(document.querySelectorAll('.proposition-card'));
+    displayPropositions();
+
+    document.getElementById('searchInput')?.addEventListener('input', performSearch);
+    document.getElementById('prevPage')?.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            displayPropositions();
+        }
+    });
+    document.getElementById('nextPage')?.addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredPropositions.length / propositionsPerPage);
+        if (currentPage < totalPages) {
+            currentPage++;
+            displayPropositions();
+        }
+    });
+});
+
 function displayPropositions() {
-    const list = document.getElementById('propositionsList');
-    list.innerHTML = "";
+    const startIndex = (currentPage - 1) * propositionsPerPage;
+    const endIndex = startIndex + propositionsPerPage;
 
-    const start = (currentPage - 1) * propositionsPerPage;
-    const end = start + propositionsPerPage;
-    const toShow = filteredPropositions.slice(start, end);
+    document.querySelectorAll('.proposition-card').forEach(card => {
+        card.style.display = 'none';
+    });
 
-    toShow.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'proposition-card';
-        card.innerHTML = `
-            <p><strong>Proposition:</strong> <span class="proposition-contenu">${p.contenu}</span></p>
-            <p><strong>Budget:</strong> <span class="proposition-budget">${p.budget}</span> TND</p>
-            <p><strong>Début:</strong> ${p.date_creation}</p>
-            <p><strong>Livraison:</strong> ${p.date_fin}</p>
-            <div class="card-actions">
-                <button onclick='openEditPopup(${JSON.stringify(p)})' class="edit-button">✏️</button>
-                <button onclick='alert("Suppression désactivée")' class="delete-button">🗑️</button>
-                <button onclick='alert("Chat simulé")' class="message-btn">Message</button>
-            </div>
-        `;
-        list.appendChild(card);
+    filteredPropositions.slice(startIndex, endIndex).forEach(card => {
+        card.style.display = 'block';
     });
 
     updatePaginationControls();
@@ -50,49 +39,54 @@ function displayPropositions() {
 
 function updatePaginationControls() {
     const totalPages = Math.ceil(filteredPropositions.length / propositionsPerPage);
-    document.getElementById("pageNumbers").textContent = `Page ${currentPage} sur ${totalPages}`;
-    document.getElementById("prevPage").disabled = currentPage === 1;
-    document.getElementById("nextPage").disabled = currentPage === totalPages;
+    const pageNumbers = document.getElementById('pageNumbers');
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+
+    if (pageNumbers) {
+        pageNumbers.textContent = `Page ${currentPage} sur ${totalPages}`;
+    }
+
+    if (prevButton) prevButton.disabled = currentPage === 1;
+    if (nextButton) nextButton.disabled = currentPage === totalPages || totalPages === 0;
 }
 
-document.getElementById('prevPage').onclick = () => {
-    if (currentPage > 1) {
-        currentPage--;
-        displayPropositions();
-    }
-};
+function performSearch() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
-document.getElementById('nextPage').onclick = () => {
-    if (currentPage < Math.ceil(filteredPropositions.length / propositionsPerPage)) {
-        currentPage++;
-        displayPropositions();
-    }
-};
+    filteredPropositions = Array.from(document.querySelectorAll('.proposition-card')).filter(card => {
+        const contenu = card.querySelector('.proposition-contenu')?.textContent.toLowerCase();
+        const budget = card.querySelector('.proposition-budget')?.textContent;
 
-document.getElementById('searchInput').addEventListener('input', () => {
-    const term = document.getElementById('searchInput').value.toLowerCase();
-    filteredPropositions = propositions.filter(p =>
-        p.contenu.toLowerCase().includes(term) || p.budget.toString().includes(term)
-    );
+        return contenu.includes(searchTerm) || budget.includes(searchTerm);
+    });
+
+    document.querySelector('.search-results-counter').textContent =
+        `${filteredPropositions.length} résultat(s) trouvé(s)`;
+
     currentPage = 1;
-    document.querySelector('.search-results-counter').textContent = `${filteredPropositions.length} résultat(s) trouvé(s)`;
     displayPropositions();
-});
+}
 
-document.getElementById('fakeCreateForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    alert("Soumission désactivée (simulation seulement)");
-    closeForm();
-});
-
-document.getElementById('editForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    alert("Modification désactivée (simulation seulement)");
-    closeEditPopup();
-});
+function startChat(user1, user2) {
+    fetch("/chat", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.content
+        },
+        body: JSON.stringify({
+            user1_id: user1,
+            user2_id: user2
+        })
+    }).then(() => {
+        window.location.href = '/message';
+    });
+}
 
 function openEditPopup(proposition) {
     document.getElementById('editPopup').style.display = 'block';
+    document.getElementById('editForm').action = `/propositions/${proposition.id}`;
     document.getElementById('editContenu').value = proposition.contenu;
     document.getElementById('editBudget').value = proposition.budget;
     document.getElementById('editDateCreation').value = proposition.date_creation;
@@ -103,14 +97,17 @@ function closeEditPopup() {
     document.getElementById('editPopup').style.display = 'none';
 }
 
-function toggleForm() {
-    document.getElementById('proposition-form').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
+// ✅ Nouvelle fonction pour gérer le clic sur le bouton Modifier
+function handleEditClick(button) {
+    const card = button.closest('.proposition-card');
 
-function closeForm() {
-    document.getElementById('proposition-form').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
+    const proposition = {
+        id: card.dataset.id,
+        contenu: card.dataset.contenu,
+        budget: card.dataset.budget,
+        date_creation: card.dataset.date_creation,
+        date_fin: card.dataset.date_fin
+    };
 
-window.onload = displayPropositions;
+    openEditPopup(proposition);
+}

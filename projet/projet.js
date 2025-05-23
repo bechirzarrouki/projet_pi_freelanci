@@ -1,5 +1,7 @@
 // Pagination
-const projects = Array.from(document.querySelectorAll('.post-card'));
+const projectsContainer = document.getElementById('projects-container');
+const paginationContainer = document.getElementById('pagination-container');
+let projects = Array.from(document.querySelectorAll('.post-card'));
 const itemsPerPage = 1;
 let currentPage = 1;
 
@@ -8,13 +10,11 @@ function displayPage(page) {
     const endIndex = startIndex + itemsPerPage;
     const currentPageProjects = projects.slice(startIndex, endIndex);
 
-    const projectsContainer = document.getElementById('projects-container');
     projectsContainer.innerHTML = '';
     currentPageProjects.forEach(project => {
         projectsContainer.appendChild(project);
     });
 
-    const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = '';
     const totalPages = Math.ceil(projects.length / itemsPerPage);
     for (let i = 1; i <= totalPages; i++) {
@@ -31,6 +31,11 @@ function displayPage(page) {
 }
 
 displayPage(currentPage);
+
+window.goToPropositions = function(projectId) {
+    window.location.href = `proposition/proposition.php?project_id=${projectId}`;
+};
+
 
 // Popup d'édition
 function openEditPopup(project) {
@@ -77,3 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
         closeEditPopup();
     });
 });
+
+// Fonction de suppression simple (à adapter selon ta logique)
+function deleteProject(id) {
+    if (confirm("Voulez-vous vraiment supprimer ce projet ?")) {
+        // Suppression simple en supprimant la carte du DOM
+        projects = projects.filter(proj => {
+            const projId = proj.querySelector('.edit-button').onclick.toString().match(/"id": (\d+)/);
+            if (projId) return parseInt(projId[1]) !== id;
+            return true;
+        });
+        displayPage(currentPage);
+    }
+}

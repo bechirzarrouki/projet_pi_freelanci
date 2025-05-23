@@ -36,9 +36,10 @@
                     <button type="button" id="loginBtn" class="btn btn-primary">Login</button>
                 </div>
 
-                <div class="text-center mt-3">
-                    <a href="#" class="btn-create">Create User</a>
-                </div>
+               <div class="text-center mt-3">
+    <a href="create.php" class="btn-create">Create User</a>
+</div>
+
             </form>
         </div>
     </div>

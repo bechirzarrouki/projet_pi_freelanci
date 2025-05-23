@@ -14,9 +14,10 @@
             <li class="link"><a href="#">Home</a></li>
             <li class="link"><a href="#">About</a></li>
         </ul>
-        <a href="login" style="color:white;">
-            <button class="btn">Login</button>
-        </a>
+      <a href="login/login.php" style="color:white;">
+    <button class="btn">Login</button>
+     </a>
+
     </nav>
 
     <header class="section__container header__container">
